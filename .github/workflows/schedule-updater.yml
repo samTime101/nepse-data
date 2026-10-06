@@ -21,7 +21,7 @@ jobs:
       - name: Run updater
         run: python dailyDataScrapper.py
       - name: Setup Git
-        run: git config --local user.email "aabishkar2@gmail.com" && git config --local user.name "Aabishkar Wagle Bot"
+        run: git config --local user.email "srijanregmi44@gmail.com" && git config --local user.name "Samip's NEPSE BOT"
       - name: Commit Files
         id: commit
         run: |
