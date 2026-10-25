@@ -1,16 +1,34 @@
 # nepse-data
 
-nepse-data is the collection of all the datasets (from past to present) of various companies listed in the Nepal Stock Market. This repository is built for the students and people who want to perform analysis on Nepal Stock Market using historical (& current) data.
+Historical and current daily OHLCV data for companies listed on the Nepal Stock Exchange (NEPSE), stored as one CSV per trading symbol.
+
+> **Fork notice**
+>
+> This repository is a fork of [Aabishkar2/nepse-data](https://github.com/Aabishkar2/nepse-data), originally created by [Aabishkar2](https://github.com/Aabishkar2) and contributors.
+>
+> **Forked on:** Tue Oct 6 07:54:16 2026 +0545.
+>
+> The original project is MIT-licensed. This fork keeps the same license — see [Credits](#credits) and [License](#license).
+
+## What is here
+
+| Path | Contents |
+| --- | --- |
+| `data/company-wise/` | One CSV per symbol, sorted oldest to newest |
+| `src/` | Scrapers and shared helpers |
+| `src/constants/companyIdMap.py` | Generated symbol → sharesansar company ID map |
+| `.github/workflows/` | Discovery, backfill, and daily update automation |
+| `.github/actions/` | Composite actions shared by the workflows |
+
+The dataset currently covers **399 symbols** and contains **over 520,000 daily rows**, with history going back to **1995-07-20**.
 
 ## Data
 
-The data can be found in the [data/company-wise](https://github.com/Aabishkar2/nepse-data/tree/main/data/company-wise) folder, one CSV per company, named by its trading symbol. For example: in `NMB.csv` you can find all the data of NMB Bank Limited sorted in ascending order (date-wise).
+Each file in `data/company-wise/` contains the daily price history for one symbol. For example, [`NMB.csv`](data/company-wise/NMB.csv) contains NMB Bank Limited's data in ascending date order.
 
-A few debenture symbols contain a slash (for example `GBILD84/85`). Since a slash cannot appear in a filename, the slash is stored as an underscore (`GBILD84_85.csv`); the daily updater maps it back to the exchange symbol automatically.
+A few debenture symbols contain a slash (for example `GBILD84/85`). Since a slash cannot appear in a filename, the slash is stored as an underscore (`GBILD84_85.csv`). The original symbol is preserved in `companyIdMap.py` and in the scrapers.
 
-The repository currently includes data for around 370 companies, with history going back as far as 1995. Feel free to create an issue if you want data of any particular company urgently.
-
-Each CSV has the following columns:
+Each CSV has these columns:
 
 | Column | Description |
 | --- | --- |
@@ -24,57 +42,71 @@ Each CSV has the following columns:
 | `traded_amount` | Total turnover for the day |
 | `status` | Derived: `1` if close > open, `-1` if open > close, `0` if equal |
 
-The Github Actions updates the data on an almost daily basis so that the datasets available here are up to date.
+Prices and turnover are in Nepalese rupees (NPR).
 
-## Code
+## Running the scrapers locally
 
-The code through which the data were/are being collected resides in the [src/](https://github.com/Aabishkar2/nepse-data/tree/main/src) folder. The code is written in `python3.8` and the required libraries are listed in `src/requirements.txt`.
-
-If you want to collect the datasets by yourself then you can run the following commands.
-
-Firstly, Just make sure you have `python3` installed 😉. If not please find python3 installation procedure over [here](https://www.python.org/downloads/)
+The scrapers target Python 3.8, which is what the GitHub Actions workflows use.
 
 ```bash
-# go into the src folder -- the scrapers must be run from here
+# run everything from src/ — the scripts use paths relative to this directory
 cd src
 
-# install requirements
-pip3 install -r requirements.txt
+python3.8 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
 # refresh the symbol -> company-id map from the live site
 # (run this before a backfill so newly listed companies are picked up)
-python3 discoverCompanies.py
+python discoverCompanies.py
 
-# for historical data collection
-# this only seeds companies that don't have a CSV yet -- existing files are left alone
-python3 allDataScrapper.py
+# seed history for companies that do not have a CSV yet
+# (on a fresh clone this can take a while; existing files are skipped)
+python allDataScrapper.py
 
-# optional -- for daily data updates
-python3 dailyDataScrapper.py
+# append the latest session's prices to existing CSVs
+python dailyDataScrapper.py
 ```
 
-A few things worth knowing:
+Notes:
 
-- All three scripts import using paths relative to `src/`, so they only work when run from inside that directory.
-- `discoverCompanies.py` regenerates `src/constants/companyIdMap.py`. That file is generated — don't hand-edit it. It merges with the existing map, so delisted companies are never dropped.
-- `allDataScrapper.py` skips any symbol that already has a CSV, so re-running it won't clobber or duplicate existing data.
-- `dailyDataScrapper.py` only appends to CSVs that already exist and is idempotent — running it twice in a day won't add a duplicate row.
+- All three scripts must run from `src/`.
+- `discoverCompanies.py` regenerates `src/constants/companyIdMap.py`. That file is generated — do not hand-edit it. It merges with the existing map, so delisted companies are never dropped.
+- `allDataScrapper.py` skips any symbol that already has a CSV, so re-running it will not clobber or duplicate existing data.
+- `dailyDataScrapper.py` only appends to CSVs that already exist and is idempotent — running it twice in a day will not add a duplicate row.
+- Network requests use a 30-second timeout.
+- The data comes from [sharesansar.com](https://www.sharesansar.com/)'s daily price and company history pages.
 
-The code that updates data runs on Github Actions from the workflows in `.github/workflows`:
+## Automation
 
-- `discover-companies.yml` refreshes the symbol map once a day, Monday to Friday.
-- `backfill-companies.yml` seeds history for newly discovered companies. It runs when discovery finishes and also retries once later in the day.
-- `update-daily-data.yml` appends the latest prices and runs 5 times every day (Monday to Friday) so that if a collection is missed, the next run picks it up.
+All scheduled runs are **Monday to Friday**, in Nepal Time (UTC+05:45).
+
+| Workflow | When | Purpose |
+| --- | --- | --- |
+| `discover-companies.yml` | 18:45 NPT | Refresh the symbol map and commit changes to `companyIdMap.py` |
+| `backfill-companies.yml` | After discovery finishes, plus a 19:45 NPT retry | Fetch full history for newly discovered symbols |
+| `update-daily-data.yml` | 19:15, 20:15, 21:15, 22:15, 23:15 NPT | Append the latest session's prices to existing CSVs |
+
+`backfill-companies.yml` is connected to `discover-companies.yml` with a `workflow_run` trigger. All three workflows share the `nepse-data-write` concurrency group so they cannot push over each other, and each commits only when something actually changed.
+
+Each workflow can also be started manually from the **Actions** tab (`workflow_dispatch`).
+
+## Credits
+
+- **Original project:** [Aabishkar2/nepse-data](https://github.com/Aabishkar2/nepse-data), created by [Aabishkar2](https://github.com/Aabishkar2) and contributors.
+- **Fork maintained at:** [samTime101/nepse-data](https://github.com/samTime101/nepse-data).
+- **Forked on:** Tue Oct 6 07:54:16 2026 +0545.
+- **Data source:** [sharesansar.com](https://www.sharesansar.com/) for daily prices and company history; NEPSE for the underlying market data.
+
+The original project is MIT-licensed, and this fork is distributed under the same license. Thank you to the original author and everyone who contributed to the upstream dataset.
 
 ## Contributing
 
-Pull requests are welcome. Please open an issue first to discuss what you would like to change.
-
-Things you can consider doing:
-
-- Github action to update data on a daily basis on Kaggle
-- Date-wise Collection of data from past to present
+Contributions are welcome. Please open an issue or pull request in this fork. If a change would also benefit the upstream project, consider opening a pull request against [Aabishkar2/nepse-data](https://github.com/Aabishkar2/nepse-data).
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+This project is licensed under the MIT License, inherited from the original repository. See [LICENSE](LICENSE) for the full text.
+
+Copyright (c) 2022 Aabishkar2 and contributors  
+Copyright (c) 2026 samTime101 and contributors
