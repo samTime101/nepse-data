@@ -6,9 +6,10 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from utils.status import getStatus
 from utils.symbols import file_stem
+from utils.session import TIMEOUT
 from constants.url import dailyPriceUrl
 
-html = requests.get(dailyPriceUrl).text
+html = requests.get(dailyPriceUrl, timeout=TIMEOUT).text
 bs = BeautifulSoup(html, "lxml")
 
 # today date in yyyy-mm-dd format

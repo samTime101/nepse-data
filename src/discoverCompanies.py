@@ -3,7 +3,7 @@ import time
 from pathlib import Path
 
 from constants.companyIdMap import companyIdMap as existingMap
-from utils.session import make_session, extract_companyid
+from utils.session import make_session, extract_companyid, TIMEOUT
 
 BASE = "https://www.sharesansar.com"
 UNIVERSE_URL = f"{BASE}/today-share-price"
@@ -45,7 +45,7 @@ def discover(session, symbols):
     for sym in sorted(symbols):
         time.sleep(DELAY)
         try:
-            resp = session.get(f"{BASE}/company/{sym.lower()}")
+            resp = session.get(f"{BASE}/company/{sym.lower()}", timeout=TIMEOUT)
             resp.raise_for_status()
             cid = extract_companyid(resp.text)
             if cid is None:
@@ -60,7 +60,7 @@ def discover(session, symbols):
 def main():
     session = make_session()
     print("Fetching universe...")
-    html = session.get(UNIVERSE_URL).text
+    html = session.get(UNIVERSE_URL, timeout=TIMEOUT).text
     symbols = parse_universe(html)
     print(f"  {len(symbols)} symbols in live universe")
 
