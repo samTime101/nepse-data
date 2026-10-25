@@ -6,7 +6,7 @@ Historical and current daily OHLCV data for companies listed on the Nepal Stock 
 >
 > This repository is a fork of [Aabishkar2/nepse-data](https://github.com/Aabishkar2/nepse-data), originally created by [Aabishkar2](https://github.com/Aabishkar2) and contributors.
 >
-> **Forked on:** Tue Oct 6 07:54:16 2026 +0545.
+> **Forked on:** Tue Oct 6 2026.
 >
 > The original project is MIT-licensed. This fork keeps the same license — see [Credits](#credits) and [License](#license).
 
@@ -95,7 +95,7 @@ Each workflow can also be started manually from the **Actions** tab (`workflow_d
 
 - **Original project:** [Aabishkar2/nepse-data](https://github.com/Aabishkar2/nepse-data), created by [Aabishkar2](https://github.com/Aabishkar2) and contributors.
 - **Fork maintained at:** [samTime101/nepse-data](https://github.com/samTime101/nepse-data).
-- **Forked on:** Tue Oct 6 07:54:16 2026 +0545.
+- **Forked on:** Tue Oct 6 2026.
 - **Data source:** [sharesansar.com](https://www.sharesansar.com/) for daily prices and company history; NEPSE for the underlying market data.
 
 The original project is MIT-licensed, and this fork is distributed under the same license. Thank you to the original author and everyone who contributed to the upstream dataset.
