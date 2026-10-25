@@ -10,7 +10,9 @@ UNIVERSE_URL = f"{BASE}/today-share-price"
 MAP_PATH = Path("constants/companyIdMap.py")
 DELAY = 0.3
 
-_LINK_RE = re.compile(r"/company/([a-z0-9]+)")
+# Debentures such as GBILD84/85 have a second slug segment; without the
+# optional group the regex truncates to "gbild84", which 404s.
+_LINK_RE = re.compile(r"/company/([a-z0-9]+(?:/[a-z0-9]+)?)")
 
 
 def parse_universe(html):

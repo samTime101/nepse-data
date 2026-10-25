@@ -5,6 +5,7 @@ import pandas as pd
 from pathlib import Path
 from bs4 import BeautifulSoup
 from utils.status import getStatus
+from utils.symbols import file_stem
 from constants.url import dailyPriceUrl
 
 html = requests.get(dailyPriceUrl).text
@@ -19,6 +20,10 @@ tables = pd.read_html(html)
 # select the first table i.e. the stock price table
 dataTable = tables[0]
 
+# Normalize symbols once so slash-containing debentures match their
+# underscores-instead-of-slashes CSV filenames (GBILD84/85 -> GBILD84_85).
+dataTable["Symbol"] = dataTable["Symbol"].map(file_stem)
+
 fileDir = Path("../data/company-wise/")
 for file in fileDir.glob("*.csv"):
     # first check if data already exist for this date
@@ -26,7 +31,7 @@ for file in fileDir.glob("*.csv"):
     lastRow = existingDf.iloc[-1]
     lastDate = lastRow["published_date"]
     if str(lastDate) != str(today):
-        symbol = str(file).split(".")[2].split("/")[-1]
+        symbol = file.stem
         data = dataTable.loc[dataTable["Symbol"] == symbol]
         if len(data) == 1:
             status = getStatus(float(data["Open"]), float(data["Close"]))

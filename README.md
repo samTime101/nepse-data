@@ -6,6 +6,8 @@ nepse-data is the collection of all the datasets (from past to present) of vario
 
 The data can be found in the [data/company-wise](https://github.com/Aabishkar2/nepse-data/tree/main/data/company-wise) folder, one CSV per company, named by its trading symbol. For example: in `NMB.csv` you can find all the data of NMB Bank Limited sorted in ascending order (date-wise).
 
+A few debenture symbols contain a slash (for example `GBILD84/85`). Since a slash cannot appear in a filename, the slash is stored as an underscore (`GBILD84_85.csv`); the daily updater maps it back to the exchange symbol automatically.
+
 The repository currently includes data for around 370 companies, with history going back as far as 1995. Feel free to create an issue if you want data of any particular company urgently.
 
 Each CSV has the following columns:

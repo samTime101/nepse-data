@@ -7,6 +7,7 @@ from constants.url import historyUrl
 from utils.session import make_session, prime_session, TIMEOUT
 from utils.params import build_history_payload
 from utils.history import page_starts, records_to_dataframe, records_total, AuthError
+from utils.symbols import file_stem
 
 OUT_DIR = Path("../data/company-wise")
 PAGE_SIZE = 50  # the API silently returns an empty result for length >= 100
@@ -62,7 +63,7 @@ def main():
 
     seeded = skipped = empty = failed = 0
     for symbol, company_id in companyIdMap.items():
-        out_file = OUT_DIR / f"{symbol}.csv"
+        out_file = OUT_DIR / f"{file_stem(symbol)}.csv"
         if out_file.exists():
             skipped += 1
             continue
