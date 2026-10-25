@@ -1,0 +1,30 @@
+name: update-daily-data
+
+on:
+  schedule:
+    # 19:15-23:15 NPT (13:30-17:30 UTC), Monday-Friday.
+    - cron: "30 13,14,15,16,17 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nepse-data-write
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: update-daily-data
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-env
+
+      - name: Update daily prices
+        working-directory: ./src
+        run: python dailyDataScrapper.py
+
+      - uses: ./.github/actions/commit-data

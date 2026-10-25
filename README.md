@@ -60,7 +60,11 @@ A few things worth knowing:
 - `allDataScrapper.py` skips any symbol that already has a CSV, so re-running it won't clobber or duplicate existing data.
 - `dailyDataScrapper.py` only appends to CSVs that already exist and is idempotent — running it twice in a day won't add a duplicate row.
 
-The code that updates data on a daily basis resides in the `.github/workflows` directory and runs on Github Actions as a CRON job. The workflow runs 5 times every day (Sunday to Friday) so that if the data collection is missed the first time then it will work the second time and so on.
+The code that updates data runs on Github Actions from the workflows in `.github/workflows`:
+
+- `discover-companies.yml` refreshes the symbol map once a day, Monday to Friday.
+- `backfill-companies.yml` seeds history for newly discovered companies. It runs when discovery finishes and also retries once later in the day.
+- `update-daily-data.yml` appends the latest prices and runs 5 times every day (Monday to Friday) so that if a collection is missed, the next run picks it up.
 
 ## Contributing
 

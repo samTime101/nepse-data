@@ -1,0 +1,35 @@
+name: backfill-companies
+
+on:
+  # Connected to discovery: runs whenever discover-companies finishes.
+  workflow_run:
+    workflows: ["discover-companies"]
+    types: [completed]
+  schedule:
+    # 19:45 NPT (14:00 UTC) retry, Monday-Friday.
+    - cron: "0 14 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nepse-data-write
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    name: backfill-companies
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-env
+
+      - name: Backfill missing companies
+        working-directory: ./src
+        run: python allDataScrapper.py
+
+      - uses: ./.github/actions/commit-data
