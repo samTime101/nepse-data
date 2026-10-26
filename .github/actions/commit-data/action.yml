@@ -8,7 +8,7 @@ runs:
       shell: bash
       working-directory: ${{ github.workspace }}
       run: |
-        git config --local user.email "srijanregmi44@gmail.com"
+        git config --local user.email "sam101-nepse-bot@users.noreply.github.com"
         git config --local user.name "Samip's NEPSE BOT"
         git add -- data src/constants/companyIdMap.py
         if git diff --staged --quiet; then
