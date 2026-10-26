@@ -2,8 +2,8 @@ name: update-daily-data
 
 on:
   schedule:
-    # 19:15-23:15 NPT (13:30-17:30 UTC), Monday-Friday.
-    - cron: "30 13,14,15,16,17 * * 1-5"
+    # 19:22-23:22 NPT (13:37-17:37 UTC), Monday-Friday. Off the half-hour to avoid GitHub scheduler drops.
+    - cron: "37 13,14,15,16,17 * * 1-5"
   workflow_dispatch:
 
 permissions:

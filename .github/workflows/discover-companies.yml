@@ -2,8 +2,8 @@ name: discover-companies
 
 on:
   schedule:
-    # 18:45 NPT (13:00 UTC), Monday-Friday.
-    - cron: "0 13 * * 1-5"
+    # 18:52 NPT (13:07 UTC), Monday-Friday. Off the hour to avoid GitHub scheduler drops.
+    - cron: "7 13 * * 1-5"
   workflow_dispatch:
 
 permissions:
