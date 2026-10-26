@@ -15,6 +15,7 @@ Historical and current daily OHLCV data for companies listed on the Nepal Stock 
 | Path | Contents |
 | --- | --- |
 | `data/company-wise/` | One CSV per symbol, sorted oldest to newest |
+| `cleaned/` | Combined cleaned dataset plus rejected-row reports |
 | `src/` | Scrapers and shared helpers |
 | `src/constants/companyIdMap.py` | Generated symbol → sharesansar company ID map |
 | `.github/workflows/` | Discovery, backfill, and daily update automation |
@@ -43,6 +44,16 @@ Each CSV has these columns:
 | `status` | Derived: `1` if close > open, `-1` if open > close, `0` if equal |
 
 Prices and turnover are in Nepalese rupees (NPR).
+
+## Cleaned data
+
+`cleaned/data.csv` is the combined, standardized dataset built from `data/company-wise`. The raw files are only read — cleaning never writes to `data/`. Rejected rows and the OHLC review report are written to `cleaned/rejected/`; OHLC consistency issues are reported but not dropped.
+
+Run it locally from the repo root:
+
+```bash
+python src/cleanData.py
+```
 
 ## Running the scrapers locally
 
@@ -86,6 +97,7 @@ All scheduled runs are **Monday to Friday**, in Nepal Time (UTC+05:45).
 | `discover-companies.yml` | 18:45 NPT | Refresh the symbol map and commit changes to `companyIdMap.py` |
 | `backfill-companies.yml` | After discovery finishes, plus a 19:45 NPT retry | Fetch full history for newly discovered symbols |
 | `update-daily-data.yml` | 19:15, 20:15, 21:15, 22:15, 23:15 NPT | Append the latest session's prices to existing CSVs |
+| `clean-data.yml` | After daily updates and backfills | Build `cleaned/data.csv` and rejected-row reports |
 
 `backfill-companies.yml` is connected to `discover-companies.yml` with a `workflow_run` trigger. All three workflows share the `nepse-data-write` concurrency group so they cannot push over each other, and each commits only when something actually changed.
 

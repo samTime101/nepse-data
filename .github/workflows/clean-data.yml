@@ -1,0 +1,44 @@
+name: clean-data
+
+on:
+  # Run after raw data changes, so the cleaned dataset stays current.
+  workflow_run:
+    workflows: ["update-daily-data", "backfill-companies"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nepse-data-write
+  cancel-in-progress: false
+
+jobs:
+  clean:
+    name: clean-data
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-env
+
+      - name: Clean data
+        working-directory: ./src
+        run: python cleanData.py
+
+      - name: Commit cleaned data
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          git config --local user.email "srijanregmi44@gmail.com"
+          git config --local user.name "Samip's NEPSE BOT"
+          git add -- cleaned
+          if git diff --staged --quiet; then
+            echo "No cleaned data changes to commit."
+            exit 0
+          fi
+          git commit -m "Update cleaned data"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
