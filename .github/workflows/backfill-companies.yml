@@ -6,8 +6,8 @@ on:
     workflows: ["discover-companies"]
     types: [completed]
   schedule:
-    # 19:52 NPT (14:07 UTC) retry, Monday-Friday. Off the hour to avoid GitHub scheduler drops.
-    - cron: "7 14 * * 1-5"
+    # 19:45 NPT (14:00 UTC) retry, Monday-Friday.
+    - cron: "0 14 * * 1-5"
   workflow_dispatch:
 
 permissions:
