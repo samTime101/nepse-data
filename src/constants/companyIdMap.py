@@ -3,6 +3,7 @@
 companyIdMap = {
     "ACLBSL": 1039,
     "ADBL": 24,
+    "ADBLD83": 996,
     "AHL": 1010,
     "AHPC": 121,
     "AKJCL": 590,
@@ -26,6 +27,7 @@ companyIdMap = {
     "BHPL": 674,
     "BJHL": 1222,
     "BNHC": 782,
+    "BNL": 98,
     "BNT": 106,
     "BOKL": 634,
     "BPCL": 119,
@@ -274,6 +276,7 @@ companyIdMap = {
     "PLIC": 144,
     "PMHPL": 681,
     "PMLI": 1296,
+    "PMLIP": 1458,
     "PPCL": 720,
     "PPL": 973,
     "PRIN": 556,
