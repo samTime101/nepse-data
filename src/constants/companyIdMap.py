@@ -205,6 +205,7 @@ companyIdMap = {
     "NABBC": 167,
     "NABIL": 16,
     "NABILD2089": 1493,
+    "NABILD87": 1304,
     "NADEP": 606,
     "NBB": 11,
     "NBBD2085": 917,
