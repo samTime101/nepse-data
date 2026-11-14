@@ -57,13 +57,13 @@ python src/cleanData.py
 
 ## Running the scrapers locally
 
-The scrapers target Python 3.8, which is what the GitHub Actions workflows use.
+The scrapers target Python 3.12, which is what the GitHub Actions workflows use.
 
 ```bash
 # run everything from src/ — the scripts use paths relative to this directory
 cd src
 
-python3.8 -m venv venv
+python3.12 -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
