@@ -30,6 +30,7 @@ companyIdMap = {
     "BNL": 98,
     "BNT": 106,
     "BOKD86": 1063,
+    "BOKD86KA": 1169,
     "BOKL": 634,
     "BPCL": 119,
     "BUNGAL": 1179,
